@@ -22,11 +22,54 @@ model User {
   @@map("users")
 }
 
+model Movie {
+  id        Int      @id @default(autoincrement())
+  image     String?
+  title     String?
+  date_created  DateTime
+  score     Int
+  characters CharactersOnMovies[] 
+  genres    Genre[]
+
+  @@map("movies")
+}
+
 model Character {
   id        Int      @id @default(autoincrement())
+  image     String?
   name      String
+  birth_date DateTime
+  weight      Float
+  history   String
+  movies    CharactersOnMovies[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("characters")
 }
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String
+  image     String?
+
+  movies   Movie @relation(fields: [movieId], references: [id])
+  movieId Int
+
+  @@map("genres")
+}
+
+model CharactersOnMovies {
+  character   Character  @relation(fields: [characterId], references: [id])
+  characterId Int // relation scalar field (used in the `@relation` attribute above)
+  movie       Movie      @relation(fields: [movieId], references: [id])
+  movieId     Int // relation scalar field (used in the `@relation` attribute above)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([characterId, movieId])
+
+  @@map("charactersonmovies")
+}
+
+
