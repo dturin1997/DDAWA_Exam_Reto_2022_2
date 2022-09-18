@@ -151,7 +151,7 @@ export const deleteOne = async(req, res) =>{
             
         })
     }catch (err) {
-        console.log(err);
+        console.log(err.message);
         return res.json({
             info: "Character already deleted",
         })
