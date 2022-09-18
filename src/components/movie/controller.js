@@ -26,33 +26,53 @@ export const create = async(req, res) => {
         info: "Movie created",
     });
     } catch (err) {
-        console.log(err);
+        return res.json({
+            info: "Can't create movie",
+            error: err.message
+        })
     }
 }
 
-////READ
+//READ
 export const readAll = async(req, res) =>{
     try{
-        const findAll = await prisma.movie.findMany()
+        const findAll = await prisma.movie.findMany({
+            select:{
+                image: true,    
+                title: true,
+                date_created: true
+            }
+        })
         return res.json(findAll)
     }catch (err) {
-        console.log(err);
+        return res.json({
+            error: err.message
+        })
       }
 }
 
+////detalles
 export const readOne = async(req, res) =>{
     try{
         const { id } = req.params
         const findOne = await prisma.movie.findUnique({
             where: {
                 id: Number(id),
+            },
+            include: {
+                characters: {
+                    include: {
+                        character: true
+                    }
+                }
             }
         })
         return res.json(findOne)
     }catch (err) {
         console.log(err);
         return res.json({
-            info: "Can't read that movie"
+            info: "Can't read that movie",
+            error: err.message
         })
       }
 }
@@ -77,7 +97,8 @@ export const update = async(req, res) =>{
     }catch (err) {
         console.log(err);
         return res.json({
-            info: "Can't update movie"
+            info: "Can't update movie",
+            error: err.message
         })
       }
 }
