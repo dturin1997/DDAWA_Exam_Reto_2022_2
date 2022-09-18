@@ -12,21 +12,22 @@ export const create = async(req, res) => {
     if (!(characterId && movieId)) {
     return res.status(400).send("All input is required");
     }
-    const createCharacterOnMovie= await prisma.characterOnMovie.create({
+    const createCharacterOnMovie= await prisma.charactersOnMovies.create({
         data:{    
-            characterId: Number(characterId),
-            movieId: Number(movieId)
+            characterId: characterId,
+            movieId: movieId
         }
     })
         // return new characters on movie   
         return res.status(201).json({
-        data:createCharacterOnMovie,
+        data: createCharacterOnMovie,
         info: "Characters on movies created",
     });
     } catch (err) {
         console.log(err);
         return res.json({
-            info: "Maybe don't exist that character ID or movie ID"
+            info: "Maybe don't exist that character ID or movie ID",
+            data: err.message
         })
     }
 }
@@ -34,12 +35,12 @@ export const create = async(req, res) => {
 ////READ
 export const readAll = async(req, res) =>{
     try{
-        const findAll = await prisma.characterOnMovie.findMany()
+        const findAll = await prisma.charactersOnMovies.findMany()
         return res.json(findAll)
     }catch (err) {
         console.log(err);
         return res.json({
-            info: err
+            info: err.message
         })
       }
 }
@@ -47,7 +48,7 @@ export const readAll = async(req, res) =>{
 export const readOne = async(req, res) =>{
     try{
         const { id } = req.params
-        const findOne = await prisma.characterOnMovie.findUnique({
+        const findOne = await prisma.charactersOnMovies.findUnique({
             where: {
                 id: Number(id),
             }
@@ -64,11 +65,21 @@ export const readOne = async(req, res) =>{
 //UPDATE
 export const update = async(req, res) =>{
     try{
-        const { id } = req.params
+        const  { id }  = req.params
+        //const  id2  = req.params.id2
         const { characterId, movieId } = req.body;
-        const updateCharacterOnMovie = await prisma.characterOnMovie.update({
+        const updateCharacterOnMovie = await prisma.charactersOnMovies.update({
             where: {
-                id: Number(id),
+                 
+                    
+                        character: Number(id),
+                    
+                    
+                       // movieId: Number(id2),
+                    
+                
+                
+                
             },
             data:{    
                 characterId: Number(characterId),
@@ -79,7 +90,8 @@ export const update = async(req, res) =>{
     }catch (err) {
         console.log(err);
         return res.json({
-            info: "Can't update characters on movie"
+            info: "Can't update characters on movie",
+            error: err.message
         })
       }
 }
