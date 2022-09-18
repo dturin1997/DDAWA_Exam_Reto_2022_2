@@ -35,30 +35,80 @@ export const create = async(req, res) => {
 //READ
 export const readAll = async(req, res) =>{
     try{
-        const findAll = await prisma.character.findMany()
+        const findAll = await prisma.character.findMany({
+            select:{
+                image: true,
+                name: true
+            }
+        })
         return res.json(findAll)
     }catch (err) {
-        console.log(err);
+        return res.json({
+            error: err.message
+        })
       }
 }
-
+///Detalles
 export const readOne = async(req, res) =>{
     try{
         const { id } = req.params
         const findOne = await prisma.character.findUnique({
             where: {
                 id: Number(id),
+            },
+            include: {
+                movies: {
+                    include: {
+                        movie: true
+                    }
+                }
             }
         })
         return res.json(findOne)
     }catch (err) {
         console.log(err);
         return res.json({
-            info: "Can't create character"
+            info: "Can't read that character",
+            error: err.message
         })
       }
 }
 
+////Busqueda de personajes
+/* por nombre*/
+export const searchByName = async(req,res)=>{
+  try{
+    const { name } = req.params
+    const findbyName = await prisma.character.findMany({
+        where: {
+            name: name,
+        },
+        include: {
+            movies: true,
+            movies: {
+                include: {
+                    movie: true
+                }
+            }
+        }
+    })
+    return res.json(findbyName)
+  }catch (err) {
+        console.log(err);
+        return res.json({
+            info: "Can't read that character",
+            error: err.message
+        })
+      }
+}
+/* Por edad*/
+export const searchByAge = async(req,res)=>{
+
+}
+/* Por idMovie */
+export const searchByMovie = async(req,res)=>{
+
+}
 //UPDATE
 export const update = async(req, res) =>{
     try{
@@ -80,7 +130,8 @@ export const update = async(req, res) =>{
     }catch (err) {
         console.log(err);
         return res.json({
-            info: "Can't update character"
+            info: "Can't update character",
+            error: err.message
         })
       }
 }
@@ -102,34 +153,7 @@ export const deleteOne = async(req, res) =>{
     }catch (err) {
         console.log(err);
         return res.json({
-            info: "Character already deleted"
+            info: "Character already deleted",
         })
       }
 }
-
-//We call function main to catch any exception and with "finally", 
-//We close the connection to the database when the script finishes
-/* create()
-    .catch((e)=>{
-        console.log(e)
-    }).finally(async ()=>{
-        await prisma.$disconnect()
-    })
-readAll()
-    .catch((e)=>{
-        console.log(e)
-    }).finally(async ()=>{
-        await prisma.$disconnect()
-    })
-update()
-    .catch((e)=>{
-        console.log(e)
-    }).finally(async ()=>{
-        await prisma.$disconnect()
-    })
-deleteOne()
-    .catch((e)=>{
-        console.log(e)
-    }).finally(async ()=>{
-        await prisma.$disconnect()
-    }) */

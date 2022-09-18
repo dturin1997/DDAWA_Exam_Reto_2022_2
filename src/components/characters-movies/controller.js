@@ -45,7 +45,7 @@ export const readAll = async(req, res) =>{
       }
 }
 
-export const readOne = async(req, res) =>{
+/* export const readOne = async(req, res) =>{
     try{
         const { id } = req.params
         const findOne = await prisma.charactersOnMovies.findUnique({
@@ -116,4 +116,4 @@ export const deleteOne = async(req, res) =>{
             info: "Characters on movie already deleted"
         })
       }
-}
+} */

@@ -4,8 +4,8 @@ import characterOnMovieRouter from "../components/characters-movies/network";
 
 // cada vez que quiera agregar una ruta nueva,
 // creo el path e importo el componente
-const listRoutes = [["/test", TestRouter],["/auth",AuthRouter],["/character", CharacterRouter],
-["/genre", GenreRouter],["/movie", MovieRouter], ["/characterOnMovies",characterOnMovieRouter]];
+const listRoutes = [["/test", TestRouter],["/auth",AuthRouter],["/characters", CharacterRouter],
+["/genres", GenreRouter],["/movies", MovieRouter], ["/characterOnMovies",characterOnMovieRouter]];
 
 export const routes = (app) => {
   listRoutes.forEach(([path, controller]) => {
