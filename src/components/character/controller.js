@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-//import set from 'date-fns';
+
 //We create a instance of PrismaClient
 const prisma = new PrismaClient();
 //We define a asynchronous function to send queries to DB
@@ -32,22 +32,82 @@ export const create = async(req, res) => {
     }
 }
 
-//READ
+//READ ALL and Search
 export const readAll = async(req, res) =>{
     try{
+
+    const { name, age, movies } = req.query
+    let search;
+
+    if(name){
+        const searchByName = await prisma.character.findMany({
+            where: {
+                name: name,
+            },
+            select: {
+                id: true,
+                image: true,
+                name: true,        
+                birth_date: true,
+                weight: true,     
+                history: true, 
+            }
+        })
+        search = searchByName;
+    }
+    else if(age){
+        const searchByAge = await prisma.character.findMany({
+            where: {
+                birth_date: new Date(age),
+            },
+            select: {
+                id: true,
+                image: true,
+                name: true,        
+                birth_date: true,
+                weight: true,     
+                history: true, 
+            }
+        })
+        search = searchByAge;
+    }
+    else if(movies){
+        const searchByIdMovie = await prisma.charactersOnMovies.findMany({
+            where: {
+                movieId: Number(movies),
+            },
+            include: {
+                character: true
+            }
+        })
+        search = searchByIdMovie;
+
+    }else if ( name == "" || age =="" || movies == ""){
+        
+        return res.json({
+            info: "No hay parámetro",
+        })
+        
+    }else{
         const findAll = await prisma.character.findMany({
             select:{
                 image: true,
                 name: true
             }
         })
-        return res.json(findAll)
+        search = findAll
+
+    }
+
+        return res.json(search);
+     
     }catch (err) {
         return res.json({
             error: err.message
         })
       }
 }
+
 ///Detalles
 export const readOne = async(req, res) =>{
     try{
@@ -74,41 +134,8 @@ export const readOne = async(req, res) =>{
       }
 }
 
-////Busqueda de personajes
-/* por nombre*/
-export const searchByName = async(req,res)=>{
-  try{
-    const { name } = req.params
-    const findbyName = await prisma.character.findMany({
-        where: {
-            name: name,
-        },
-        include: {
-            movies: true,
-            movies: {
-                include: {
-                    movie: true
-                }
-            }
-        }
-    })
-    return res.json(findbyName)
-  }catch (err) {
-        console.log(err);
-        return res.json({
-            info: "Can't read that character",
-            error: err.message
-        })
-      }
-}
-/* Por edad*/
-export const searchByAge = async(req,res)=>{
 
-}
-/* Por idMovie */
-export const searchByMovie = async(req,res)=>{
 
-}
 //UPDATE
 export const update = async(req, res) =>{
     try{
