@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-//import set from 'date-fns';
+
 //We create a instance of PrismaClient
 const prisma = new PrismaClient();
 //We define a asynchronous function to send queries to DB
@@ -33,9 +33,51 @@ export const create = async(req, res) => {
     }
 }
 
-//READ
+//READ ALL and Search 
 export const readAll = async(req, res) =>{
     try{
+
+        const { name, gender, order } = req.query
+      let search;
+  
+      if(name){
+          const searchByName = await prisma.movie.findMany({
+              where: {
+                  title: name,
+              },
+              select: {
+                id: true,
+                image: true,    
+                title: true,
+                date_created: true
+              }
+          })
+          search = searchByName;
+      }
+      else if(gender){
+          const searchByGenre = await prisma.genre.findMany({
+              where: {
+                  name: gender,
+              },
+              include: {
+                movies: true
+              }
+          })
+          search = searchByGenre;
+      }
+      else if(order){
+          const searchByOrder = await prisma.movie.findMany({
+              orderBy: {
+                date_created: order,
+              },
+          })
+          search = searchByOrder;
+  
+      }else if(name == "" || gender =="" || order == ""){
+        return res.json({
+            info: "No hay parámetro",
+        })
+      }else{
         const findAll = await prisma.movie.findMany({
             select:{
                 image: true,    
@@ -43,7 +85,10 @@ export const readAll = async(req, res) =>{
                 date_created: true
             }
         })
-        return res.json(findAll)
+        search = findAll;
+      }
+
+    return res.json(search)
     }catch (err) {
         return res.json({
             error: err.message
@@ -76,6 +121,7 @@ export const readOne = async(req, res) =>{
         })
       }
 }
+
 
 //UPDATE
 export const update = async(req, res) =>{
